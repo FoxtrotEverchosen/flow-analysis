@@ -50,6 +50,7 @@ ggsave("mapka.png", plot=mapa, width = 8, height=6, dpi=1000)
 library(climate)
 
 # Creates dataset. 2023 could not be parsed by hydro_imgw, so it required manual loading. 
+old_enc = getOption("encoding")
 options(encoding = "CP1250")
 data_pre23 = lapply(stations, function(s) {
   hydro_imgw("daily", year=2015:2022, station=s, allow_failure=FALSE)$COPRZP
@@ -57,7 +58,7 @@ data_pre23 = lapply(stations, function(s) {
 data_post23 = lapply(stations, function(s) {
   hydro_imgw("daily", year=2024, station=s, allow_failure=FALSE)$COPRZP
 })
-options(encoding = "native.enc")
+options(encoding = old_enc)
 
 y23 = read.csv("codz_2023.csv")
 
@@ -111,11 +112,8 @@ for (i in 1:3) {
   do.call(vioplot, c(year_data, list(
     names = years_unique,
     col   = colors[i],
-    main  = stations[i],
-    xlab  = "Rok",
-    ylab  = "Przepływ [m3/s]"
+    main  = stations[i]
   )))
+  mtext("Rok", side=1, line=3)
+  mtext("Przepływ [m3/s]", side=2, line=3)
 }
-
-
-
