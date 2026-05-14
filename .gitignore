@@ -1,0 +1,7 @@
+*.ods
+Stacje_wybrane.csv
+*.png
+*.jpg
+*.tiff
+.RData
+.Rhistory
