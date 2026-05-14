@@ -4,6 +4,7 @@ install_github("bczernecki/climate")
 install.packages('archive')
 install.packages(c('s2', 'units'))
 install.packages("sf", "ggplot2")
+install.packages("vioplot")
 
 # station swapped from Jelenia Góra to Fasty due to error while downloading data
 stations = c("BOŻEPOLE SZLACHECKIE", "FASTY" , "LGOTA NADWARCIE")
@@ -22,8 +23,8 @@ bp = c(53.97269, 18.22538)
 f  = c(53.17387, 23.02267)
 ln = c(50.61779, 19.25572)
 
-stacje_df = data.frame(
-  stacja = stations,
+stations_df = data.frame(
+  station = stations,
   lat    = c(bp[1], f[1], ln[1]),
   lon    = c(bp[2], f[2], ln[2])
 )
@@ -48,13 +49,13 @@ ggsave("mapka.png", plot=mapa, width = 8, height=6, dpi=1000)
 
 library(climate)
 
-# create a set with data. Excludes year 2023 due to some data errors
+# Creates dataset. 2023 could not be parsed by hydro_imgw, so it required manual loading. 
 options(encoding = "CP1250")
 data_pre23 = lapply(stations, function(s) {
   hydro_imgw("daily", year=2015:2022, station=s, allow_failure=FALSE)$COPRZP
 })
 data_post23 = lapply(stations, function(s) {
-  hydro_imgw("daily", year=2024:2025, station=s, allow_failure=FALSE)$COPRZP
+  hydro_imgw("daily", year=2024, station=s, allow_failure=FALSE)$COPRZP
 })
 options(encoding = "native.enc")
 
@@ -69,6 +70,7 @@ data = list(
 max_y = max(data[[1]], data[[2]], data[[3]])
 dates = seq(as.Date("2015-01-01"), as.Date("2024-12-31"), by="day")
 
+# Plots
 plot(dates, data[[1]], type="l", ylim=c(0,10), xaxt="n", col="blue")
 axis(1, at=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), labels=2015:2025)
 abline(v=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), col="black", lty=3)
@@ -97,7 +99,23 @@ hist(data[[1]], xlim=c(0,10), ylim=c(0, 1000), las=1, xlab="Przepływ [m3/s]", y
 hist(data[[2]], xlim=c(0,40), ylim=c(0, 800), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col="darkgreen")
 hist(data[[3]], xlim=c(0,20), ylim=c(0, 1400), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col="gold3")
 
+library(vioplot)
+years_unique = 2015:2024
+colors = c("blue", "darkgreen", "gold3")
 
+for (i in 1:3) {
+  year_data = lapply(years_unique, function(y) {
+    data[[i]][format(dates, "%Y") == y]
+  })
+  
+  do.call(vioplot, c(year_data, list(
+    names = years_unique,
+    col   = colors[i],
+    main  = stations[i],
+    xlab  = "Rok",
+    ylab  = "Przepływ [m3/s]"
+  )))
+}
 
 
 
