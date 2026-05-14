@@ -28,21 +28,21 @@ stations_df = data.frame(
   lat    = c(bp[1], f[1], ln[1]),
   lon    = c(bp[2], f[2], ln[2])
 )
-stacje_sf = st_as_sf(stacje_df, coords = c("lon", "lat"), crs = 4326)
+stations_sf = st_as_sf(stations_df, coords = c("lon", "lat"), crs = 4326)
 
-Polska = read_sf("polska_84.shp")
-stacje_sf = st_transform(stacje_sf, st_crs(Polska))
+Poland = read_sf("polska_84.shp")
+stations_sf = st_transform(stations_sf, st_crs(Poland))
 
-mapa = ggplot() +
-  geom_sf(data = Polska, size = 0.1, color = "black", fill = "NA") +
+map = ggplot() +
+  geom_sf(data = Poland, size = 0.1, color = "black", fill = "NA") +
   theme_minimal() +
   ggtitle("Stacje hydrologiczne") +
   coord_sf() +
-  geom_sf(data = stacje_sf, size = 3, color = "red") +
-  geom_sf_text(data = stacje_sf, aes(label = stacja), hjust = 0, size = 3, nudge_y = 0.2)
+  geom_sf(data = stations_sf, size = 3, color = "red") +
+  geom_sf_text(data = stations_sf, aes(label = station), hjust = 0, size = 3, nudge_y = 0.2)
 
-plot(mapa)
-ggsave("mapka.png", plot=mapa, width = 8, height=6, dpi=1000)
+plot(map)
+ggsave("mapka.png", plot=map, width = 8, height=6, dpi=1000)
 
 
 # ------- Initial Analysis
