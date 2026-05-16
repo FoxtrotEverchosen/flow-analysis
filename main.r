@@ -10,7 +10,6 @@ install.packages("vioplot")
 stations = c("BOŻEPOLE SZLACHECKIE", "FASTY" , "LGOTA NADWARCIE")
 setwd("/home/Fedora/rprojects/")
 
-
 # ------- Map
 
 library(sf)
@@ -48,6 +47,7 @@ ggsave("mapka.png", plot=map, width = 8, height=6, dpi=1000)
 # ------- Initial Analysis
 
 library(climate)
+colors = c("blue", "darkgreen", "gold3")
 
 # Creates dataset. 2023 could not be parsed by hydro_imgw, so it required manual loading. 
 old_enc = getOption("encoding")
@@ -72,37 +72,36 @@ max_y = max(data[[1]], data[[2]], data[[3]])
 dates = seq(as.Date("2015-01-01"), as.Date("2024-12-31"), by="day")
 
 # Plots
-plot(dates, data[[1]], type="l", ylim=c(0,10), xaxt="n", col="blue")
+plot(dates, data[[1]], type="l", ylim=c(0,10), xaxt="n", col=colors[1])
 axis(1, at=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), labels=2015:2025)
 abline(v=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), col="black", lty=3)
 abline(h=pretty(data[[1]]), col="black", lty=3)
 
-plot(dates, data[[2]], type="l", ylim=c(0,max_y), xaxt="n", col='darkgreen')
+plot(dates, data[[2]], type="l", ylim=c(0,max_y), xaxt="n", col=colors[2])
 axis(1, at=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), labels=2015:2025)
 abline(v=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), col="black", lty=3)
 abline(h=pretty(data[[2]]), col="black", lty=3)
 
-plot(dates, data[[3]], type="l", ylim=c(0,20), xaxt="n", col="gold3")
+plot(dates, data[[3]], type="l", ylim=c(0,20), xaxt="n", col=colors[2])
 axis(1, at=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), labels=2015:2025)
 abline(v=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), col="black", lty=3)
 abline(h=pretty(data[[3]]), col="black", lty=3)
 
 
-plot(data[[1]], type="l", ylim=c(0,max_y), xlim=c(0, 4000), col="blue")
-lines(data[[2]], col="darkgreen")
-lines(data[[3]], col="gold3")
-legend("topright", legend=stations, col=c("blue","darkgreen","gold3"), lty=1)
+plot(data[[1]], type="l", ylim=c(0,max_y), xlim=c(0, 4000), col=colors[1])
+lines(data[[2]], col=colors[2])
+lines(data[[3]], col=colors[3])
+legend("topright", legend=stations, col=colors, lty=1)
 
-boxplot(data[[1]], data[[2]], data[[3]], names=stations, ylim=c(0, 20), outline=F)
-boxplot(data[[1]], data[[3]], names=c(stations[1], stations[3]), ylim=c(0, 5), outline=F)
+boxplot(data, names=stations, ylim=c(0, 20), outline=F, col=colors)
+boxplot(data[[1]], data[[3]], names=c(stations[1], stations[3]), ylim=c(0, 5), outline=F, col=c(colors[1], colors[3]))
 
-hist(data[[1]], xlim=c(0,10), ylim=c(0, 1000), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col="blue")
-hist(data[[2]], xlim=c(0,40), ylim=c(0, 800), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col="darkgreen")
-hist(data[[3]], xlim=c(0,20), ylim=c(0, 1400), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col="gold3")
+hist(data[[1]], xlim=c(0,10), ylim=c(0, 1000), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col=colors[1])
+hist(data[[2]], xlim=c(0,40), ylim=c(0, 800), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col=colors[2])
+hist(data[[3]], xlim=c(0,20), ylim=c(0, 1400), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col=colors[3])
 
 library(vioplot)
 years_unique = 2015:2024
-colors = c("blue", "darkgreen", "gold3")
 
 for (i in 1:3) {
   year_data = lapply(years_unique, function(y) {
@@ -117,3 +116,21 @@ for (i in 1:3) {
   mtext("Rok", side=1, line=3)
   mtext("Przepływ [m3/s]", side=2, line=3)
 }
+
+for (i in 1:3) {
+  year_data = lapply(years_unique, function(y) {
+    data[[i]][format(dates, "%Y") == y]
+  })
+  
+  do.call(boxplot, c(year_data, list(
+    names = years_unique,
+    col   = colors[i],
+    main  = stations[i],
+    outline = F
+  )))
+  mtext("Rok", side=1, line=3)
+  mtext("Przepływ [m3/s]", side=2, line=3)
+}
+
+
+
