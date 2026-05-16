@@ -71,34 +71,40 @@ data = list(
 max_y = max(data[[1]], data[[2]], data[[3]])
 dates = seq(as.Date("2015-01-01"), as.Date("2024-12-31"), by="day")
 
+make_main <- function(id){
+  paste("Przepływy na stacji", stations[id], sep=" ")
+}
+
 # Plots
-plot(dates, data[[1]], type="l", ylim=c(0,10), xaxt="n", col=colors[1])
+plot(dates, data[[1]], type="l", ylim=c(0,10), xaxt="n", col=colors[1], main=make_main(1), ylab="Przepływ [m3/s]", xlab="Rok")
 axis(1, at=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), labels=2015:2025)
 abline(v=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), col="black", lty=3)
 abline(h=pretty(data[[1]]), col="black", lty=3)
 
-plot(dates, data[[2]], type="l", ylim=c(0,max_y), xaxt="n", col=colors[2])
+plot(dates, data[[2]], type="l", ylim=c(0,max_y), xaxt="n", col=colors[2], main=make_main(2), ylab="Przepływ [m3/s]", xlab="Rok")
 axis(1, at=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), labels=2015:2025)
 abline(v=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), col="black", lty=3)
 abline(h=pretty(data[[2]]), col="black", lty=3)
 
-plot(dates, data[[3]], type="l", ylim=c(0,20), xaxt="n", col=colors[2])
+plot(dates, data[[3]], type="l", ylim=c(0,20), xaxt="n", col=colors[2], main=make_main(3), ylab="Przepływ [m3/s]", xlab="Rok")
 axis(1, at=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), labels=2015:2025)
 abline(v=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), col="black", lty=3)
 abline(h=pretty(data[[3]]), col="black", lty=3)
 
-
-plot(data[[1]], type="l", ylim=c(0,max_y), xlim=c(0, 4000), col=colors[1])
-lines(data[[2]], col=colors[2])
-lines(data[[3]], col=colors[3])
+plot(dates, data[[1]], type="l", ylim=c(0,max_y), col=colors[1], xaxt="n", main="Porównanie przepływów", ylab="Przepływ [m3/s]", xlab="Rok")
+axis(1, at=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), labels=2015:2025)
+abline(v=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), col="black", lty=3)
+abline(h=pretty(data[[2]]), col="black", lty=3)
+lines(dates, data[[2]], col=colors[2])
+lines(dates, data[[3]], col=colors[3])
 legend("topright", legend=stations, col=colors, lty=1)
 
-boxplot(data, names=stations, ylim=c(0, 20), outline=F, col=colors)
-boxplot(data[[1]], data[[3]], names=c(stations[1], stations[3]), ylim=c(0, 5), outline=F, col=c(colors[1], colors[3]))
+boxplot(data, names=stations, ylim=c(0, 20), outline=F, col=colors, ylab="Przepływy [m3/s]", main="Porównanie przepływów - boxplot")
+boxplot(data[[1]], data[[3]], names=c(stations[1], stations[3]), ylim=c(0, 5), outline=F, col=c(colors[1], colors[3]), ylab="Przepływy [m3/s]", main="Porównanie przepływów - boxplot")
 
-hist(data[[1]], xlim=c(0,10), ylim=c(0, 1000), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col=colors[1])
-hist(data[[2]], xlim=c(0,40), ylim=c(0, 800), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col=colors[2])
-hist(data[[3]], xlim=c(0,20), ylim=c(0, 1400), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col=colors[3])
+hist(data[[1]], xlim=c(0,10), ylim=c(0, 1000), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col=colors[1], main=make_main(1))
+hist(data[[2]], xlim=c(0,40), ylim=c(0, 800), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col=colors[2], main=make_main(1))
+hist(data[[3]], xlim=c(0,20), ylim=c(0, 1400), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col=colors[3], main=make_main(1))
 
 library(vioplot)
 years_unique = 2015:2024
@@ -111,7 +117,7 @@ for (i in 1:3) {
   do.call(vioplot, c(year_data, list(
     names = years_unique,
     col   = colors[i],
-    main  = stations[i]
+    main  = make_main(i)
   )))
   mtext("Rok", side=1, line=3)
   mtext("Przepływ [m3/s]", side=2, line=3)
@@ -125,7 +131,7 @@ for (i in 1:3) {
   do.call(boxplot, c(year_data, list(
     names = years_unique,
     col   = colors[i],
-    main  = stations[i],
+    main  = make_main(i),
     outline = F
   )))
   mtext("Rok", side=1, line=3)
