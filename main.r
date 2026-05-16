@@ -86,7 +86,7 @@ axis(1, at=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), labels=
 abline(v=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), col="black", lty=3)
 abline(h=pretty(data[[2]]), col="black", lty=3)
 
-plot(dates, data[[3]], type="l", ylim=c(0,20), xaxt="n", col=colors[2], main=make_main(3), ylab="Przepływ [m3/s]", xlab="Rok")
+plot(dates, data[[3]], type="l", ylim=c(0,20), xaxt="n", col=colors[3], main=make_main(3), ylab="Przepływ [m3/s]", xlab="Rok")
 axis(1, at=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), labels=2015:2025)
 abline(v=seq(as.Date("2015-01-01"), as.Date("2025-01-01"), by="year"), col="black", lty=3)
 abline(h=pretty(data[[3]]), col="black", lty=3)
@@ -102,9 +102,14 @@ legend("topright", legend=stations, col=colors, lty=1)
 boxplot(data, names=stations, ylim=c(0, 20), outline=F, col=colors, ylab="Przepływy [m3/s]", main="Porównanie przepływów - boxplot")
 boxplot(data[[1]], data[[3]], names=c(stations[1], stations[3]), ylim=c(0, 5), outline=F, col=c(colors[1], colors[3]), ylab="Przepływy [m3/s]", main="Porównanie przepływów - boxplot")
 
-hist(data[[1]], xlim=c(0,10), ylim=c(0, 1000), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col=colors[1], main=make_main(1))
-hist(data[[2]], xlim=c(0,40), ylim=c(0, 800), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col=colors[2], main=make_main(1))
-hist(data[[3]], xlim=c(0,20), ylim=c(0, 1400), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col=colors[3], main=make_main(1))
+hist(data[[1]], breaks=seq(0,10,0.5), xlim=c(0,10), ylim=c(0, 1200), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col=colors[1], main=make_main(1), xaxt="n", labels=T)
+axis(1, at=seq(0,10,0.5))
+
+hist(data[[2]], breaks=seq(0,40,2), xlim=c(0,40), ylim=c(0, 1000), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col=colors[2], main=make_main(2), xaxt="n", labels=T)
+axis(1, at=seq(0,40,2))
+
+hist(data[[3]], breaks=seq(0,20,1), xlim=c(0,20), ylim=c(0, 1600), las=1, xlab="Przepływ [m3/s]", ylab="Częstość", col=colors[3], main=make_main(3), xaxt="n", labels=T)
+axis(1, at=seq(0,20,1))
 
 library(vioplot)
 years_unique = 2015:2024
@@ -121,12 +126,6 @@ for (i in 1:3) {
   )))
   mtext("Rok", side=1, line=3)
   mtext("Przepływ [m3/s]", side=2, line=3)
-}
-
-for (i in 1:3) {
-  year_data = lapply(years_unique, function(y) {
-    data[[i]][format(dates, "%Y") == y]
-  })
   
   do.call(boxplot, c(year_data, list(
     names = years_unique,
@@ -137,6 +136,3 @@ for (i in 1:3) {
   mtext("Rok", side=1, line=3)
   mtext("Przepływ [m3/s]", side=2, line=3)
 }
-
-
-
